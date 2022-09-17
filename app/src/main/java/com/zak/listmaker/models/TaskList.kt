@@ -6,8 +6,8 @@ import android.os.Parcelable
 class TaskList(val name: String, val tasks: ArrayList<String> = arrayListOf()): Parcelable {
 
     constructor(parcel: Parcel) : this(
-        parcel.readString()!!,
-        parcel.createStringArrayList()!!
+        parcel.readString() ?: "EMPTY",
+        parcel.createStringArrayList() ?: arrayListOf()
     )
 
     override fun describeContents(): Int = 0

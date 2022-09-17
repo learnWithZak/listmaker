@@ -9,17 +9,20 @@ import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
 import com.zak.listmaker.databinding.ActivityMainBinding
-import com.zak.listmaker.databinding.FragmentMainBinding
 import com.zak.listmaker.models.TaskList
 import com.zak.listmaker.ui.main.ListDetailActivity
 import com.zak.listmaker.ui.main.MainFragment
 import com.zak.listmaker.ui.main.MainViewModel
 import com.zak.listmaker.ui.main.MainViewModelFactory
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), MainFragment.MainFragmentInteractionListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
+
+    companion object {
+        const val INTENT_LIST_KEY = "list"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,8 +31,9 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
         if (savedInstanceState == null) {
+            val mainFragment = MainFragment.newInstance(this)
             supportFragmentManager.beginTransaction()
-                .replace(R.id.container, MainFragment.newInstance())
+                .replace(R.id.container, mainFragment)
                 .commitNow()
         }
 
@@ -51,15 +55,21 @@ class MainActivity : AppCompatActivity() {
 
         builder.setPositiveButton(positiveButtonTitle) { dialog, _ ->
             dialog.dismiss()
-            viewModel.saveList(TaskList(listTitleEditText.text.toString()))
+            val taskList = TaskList(listTitleEditText.text.toString())
+            viewModel.saveList(taskList)
+            showListDetail(taskList)
         }
 
         builder.create().show()
     }
 
-    private fun showListDetails(list: TaskList) {
+    private fun showListDetail(list: TaskList) {
         val listDetailIntent = Intent(this, ListDetailActivity::class.java)
         listDetailIntent.putExtra(INTENT_LIST_KEY, list)
         startActivity(listDetailIntent)
+    }
+
+    override fun listItemTapped(list: TaskList) {
+        showListDetail(list)
     }
 }
