@@ -1,5 +1,6 @@
 package com.zak.listmaker.ui.main
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.InputType
@@ -54,5 +55,14 @@ class ListDetailActivity : AppCompatActivity() {
             .show()
     }
 
+    override fun onBackPressed() {
+        val bundle = Bundle()
+        bundle.putParcelable(INTENT_LIST_KEY, viewModel.list)
+
+        val intent = Intent()
+        intent.putExtras(bundle)
+        setResult(RESULT_OK, intent)
+        super.onBackPressed()
+    }
 
 }
