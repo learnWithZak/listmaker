@@ -4,9 +4,9 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Parcelable
 import android.preference.PreferenceManager
 import android.text.InputType
+import android.util.Log
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity(), MainFragment.MainFragmentInteractionLi
         if (savedInstanceState == null) {
             val mainFragment = MainFragment.newInstance(this)
             supportFragmentManager.beginTransaction()
-                .replace(R.id.container, mainFragment)
+                .replace(R.id.detail_container, mainFragment)
                 .commitNow()
         }
 
@@ -51,6 +51,7 @@ class MainActivity : AppCompatActivity(), MainFragment.MainFragmentInteractionLi
             data?.let {
                 val newData = data.getParcelableExtra(INTENT_LIST_KEY) ?: TaskList("EMPTY")
                 viewModel.updateList(newData)
+                viewModel.refreshLists()
             }
         }
     }

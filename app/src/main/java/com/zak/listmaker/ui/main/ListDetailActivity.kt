@@ -7,7 +7,6 @@ import android.text.InputType
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
-import com.zak.listmaker.MainActivity
 import com.zak.listmaker.MainActivity.Companion.INTENT_LIST_KEY
 import com.zak.listmaker.R
 import com.zak.listmaker.databinding.ActivityListDetailBinding
@@ -34,7 +33,7 @@ class ListDetailActivity : AppCompatActivity() {
         title = viewModel.list.name
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.container, ListDetailFragment.newInstance())
+                .replace(R.id.detail_container, ListDetailFragment.newInstance())
                 .commitNow()
         }
     }
