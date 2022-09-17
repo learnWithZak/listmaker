@@ -1,5 +1,6 @@
 package com.zak.listmaker
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -10,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.zak.listmaker.databinding.ActivityMainBinding
 import com.zak.listmaker.databinding.FragmentMainBinding
 import com.zak.listmaker.models.TaskList
+import com.zak.listmaker.ui.main.ListDetailActivity
 import com.zak.listmaker.ui.main.MainFragment
 import com.zak.listmaker.ui.main.MainViewModel
 import com.zak.listmaker.ui.main.MainViewModelFactory
@@ -53,5 +55,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         builder.create().show()
+    }
+
+    private fun showListDetails(list: TaskList) {
+        val listDetailIntent = Intent(this, ListDetailActivity::class.java)
+        listDetailIntent.putExtra(INTENT_LIST_KEY, list)
+        startActivity(listDetailIntent)
     }
 }
