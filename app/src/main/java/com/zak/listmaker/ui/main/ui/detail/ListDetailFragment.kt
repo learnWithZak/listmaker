@@ -30,8 +30,6 @@ class ListDetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentListDetailBinding.inflate(inflater, container, false)
-        val recyclerViewAdapter = ListItemsRecyclerViewAdapter(arrayListOf(), TaskList(""))
-        binding.listsRecyclerview.adapter = recyclerViewAdapter
         return binding.root
     }
 
