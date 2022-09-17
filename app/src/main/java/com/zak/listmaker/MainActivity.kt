@@ -9,6 +9,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
 import com.zak.listmaker.databinding.ActivityMainBinding
 import com.zak.listmaker.databinding.FragmentMainBinding
+import com.zak.listmaker.models.TaskList
 import com.zak.listmaker.ui.main.MainFragment
 import com.zak.listmaker.ui.main.MainViewModel
 import com.zak.listmaker.ui.main.MainViewModelFactory
@@ -48,6 +49,7 @@ class MainActivity : AppCompatActivity() {
 
         builder.setPositiveButton(positiveButtonTitle) { dialog, _ ->
             dialog.dismiss()
+            viewModel.saveList(TaskList(listTitleEditText.text.toString()))
         }
 
         builder.create().show()

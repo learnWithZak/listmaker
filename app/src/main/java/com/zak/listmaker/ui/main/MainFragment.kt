@@ -28,14 +28,17 @@ class MainFragment : Fragment() {
         binding = FragmentMainBinding.inflate(inflater, container, false)
 
         binding.listsRecyclerview.layoutManager = LinearLayoutManager(requireContext())
-        binding.listsRecyclerview.adapter = ListSelectionRecyclerViewAdapter()
         return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(requireActivity(), MainViewModelFactory(PreferenceManager.getDefaultSharedPreferences(requireActivity()))).get(MainViewModel::class.java)
-        // TODO: Use the ViewModel
+        val recyclerViewAdapter = ListSelectionRecyclerViewAdapter(viewModel.lists)
+        binding.listsRecyclerview.adapter = recyclerViewAdapter
+        viewModel.onListAdded = {
+            recyclerViewAdapter.listsUpdated()
+        }
     }
 
 }
