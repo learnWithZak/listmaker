@@ -12,8 +12,10 @@ import com.zak.listmaker.R
 import com.zak.listmaker.databinding.FragmentMainBinding
 import com.zak.listmaker.models.TaskList
 
-class MainFragment(var clickListener: MainFragmentInteractionListener) : Fragment(),
+class MainFragment : Fragment(),
     ListSelectionRecyclerViewAdapter.ListSelectionRecyclerViewClickListener {
+
+    lateinit var clickListener: MainFragmentInteractionListener
 
     interface MainFragmentInteractionListener {
         fun listItemTapped(list: TaskList)
@@ -22,7 +24,7 @@ class MainFragment(var clickListener: MainFragmentInteractionListener) : Fragmen
     private lateinit var binding: FragmentMainBinding
 
     companion object {
-        fun newInstance(clickListener: MainFragmentInteractionListener) = MainFragment(clickListener)
+        fun newInstance() = MainFragment()
     }
 
     private lateinit var viewModel: MainViewModel
