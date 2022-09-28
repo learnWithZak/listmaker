@@ -6,11 +6,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.text.InputType
-import android.util.Log
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
-import com.zak.listmaker.databinding.ActivityMainBinding
+import com.zak.listmaker.databinding.MainActivityBinding
 import com.zak.listmaker.models.TaskList
 import com.zak.listmaker.ui.main.ListDetailActivity
 import com.zak.listmaker.ui.main.MainFragment
@@ -19,7 +18,7 @@ import com.zak.listmaker.ui.main.MainViewModelFactory
 
 class MainActivity : AppCompatActivity(), MainFragment.MainFragmentInteractionListener {
 
-    private lateinit var binding: ActivityMainBinding
+    private lateinit var binding: MainActivityBinding
     private lateinit var viewModel: MainViewModel
 
     companion object {
@@ -30,14 +29,23 @@ class MainActivity : AppCompatActivity(), MainFragment.MainFragmentInteractionLi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this, MainViewModelFactory(PreferenceManager.getDefaultSharedPreferences(this))).get(MainViewModel::class.java)
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = MainActivityBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
         if (savedInstanceState == null) {
-            val mainFragment = MainFragment.newInstance(this)
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.detail_container, mainFragment)
-                .commitNow()
+            val mainFragment = MainFragment.newInstance()
+            mainFragment.clickListener = this
+
+            val fragmentContainerViewId: Int = if (binding.mainFragmentContainer == null) {
+                R.id.detail_container
+            } else {
+                R.id.main_fragment_container
+            }
+
+            supportFragmentManager.commit {
+                setReorderingAllowed(true)
+                add(fragmentContainerViewId, mainFragment)
+            }
         }
 
         binding.fabButton.setOnClickListener {

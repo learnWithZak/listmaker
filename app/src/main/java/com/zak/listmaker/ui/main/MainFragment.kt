@@ -12,7 +12,7 @@ import com.zak.listmaker.R
 import com.zak.listmaker.databinding.FragmentMainBinding
 import com.zak.listmaker.models.TaskList
 
-class MainFragment(private val clickListener: MainFragmentInteractionListener) : Fragment(),
+class MainFragment(var clickListener: MainFragmentInteractionListener) : Fragment(),
     ListSelectionRecyclerViewAdapter.ListSelectionRecyclerViewClickListener {
 
     interface MainFragmentInteractionListener {
