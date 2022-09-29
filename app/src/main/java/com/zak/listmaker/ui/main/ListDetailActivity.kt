@@ -7,6 +7,7 @@ import android.text.InputType
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
+import androidx.preference.PreferenceManager
 import com.zak.listmaker.MainActivity.Companion.INTENT_LIST_KEY
 import com.zak.listmaker.R
 import com.zak.listmaker.databinding.ActivityListDetailBinding
@@ -17,7 +18,7 @@ import com.zak.listmaker.ui.main.ui.detail.ListDetailViewModel
 class ListDetailActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityListDetailBinding
-    lateinit var viewModel: ListDetailViewModel
+    lateinit var viewModel: MainViewModel
     lateinit var fragment: ListDetailFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,7 +29,7 @@ class ListDetailActivity : AppCompatActivity() {
         binding.addTaskButton.setOnClickListener {
             showCreateTaskDialog()
         }
-        viewModel = ViewModelProvider(this).get(ListDetailViewModel::class.java)
+        viewModel = ViewModelProvider(this, MainViewModelFactory(PreferenceManager.getDefaultSharedPreferences(this)))[MainViewModel::class.java]
         viewModel.list = intent.getParcelableExtra(INTENT_LIST_KEY) ?: TaskList("EMPTY")
         title = viewModel.list.name
         if (savedInstanceState == null) {

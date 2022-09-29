@@ -5,7 +5,10 @@ import androidx.lifecycle.ViewModel
 import com.zak.listmaker.models.TaskList
 
 class MainViewModel(private val sharedPreferences: SharedPreferences) : ViewModel() {
+
     lateinit var onListAdded: (() -> Unit)
+    lateinit var onTaskAdded: (() -> Unit)
+    lateinit var list: TaskList
 
     val lists: MutableList<TaskList> by lazy {
         retrieveLists()
@@ -37,5 +40,10 @@ class MainViewModel(private val sharedPreferences: SharedPreferences) : ViewMode
     fun refreshLists() {
         lists.clear()
         lists.addAll(retrieveLists())
+    }
+
+    fun addTask(task: String) {
+        list.tasks.add(task)
+        onTaskAdded.invoke()
     }
 }
