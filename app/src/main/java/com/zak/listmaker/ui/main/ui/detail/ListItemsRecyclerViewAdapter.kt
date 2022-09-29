@@ -19,4 +19,7 @@ class ListItemsRecyclerViewAdapter(var list: TaskList) : RecyclerView.Adapter<Li
         holder.binding.textViewTask.text = list.tasks[position]
     }
 
+    fun tasksUpdated() {
+        notifyItemInserted(list.tasks.size - 1)
+    }
 }

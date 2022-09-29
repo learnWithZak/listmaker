@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.text.InputType
+import android.util.Log
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
@@ -31,10 +32,16 @@ class MainActivity : AppCompatActivity(), MainFragment.MainFragmentInteractionLi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this, MainViewModelFactory(PreferenceManager.getDefaultSharedPreferences(this))).get(MainViewModel::class.java)
+
+        viewModel = ViewModelProvider(
+            this,
+            MainViewModelFactory(androidx.preference.PreferenceManager.getDefaultSharedPreferences(this))
+        ).get(MainViewModel::class.java)
+
         binding = MainActivityBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+        Log.i("MainActivity", viewModel.toString())
         if (savedInstanceState == null) {
             val mainFragment = MainFragment.newInstance()
             mainFragment.clickListener = this
@@ -56,13 +63,20 @@ class MainActivity : AppCompatActivity(), MainFragment.MainFragmentInteractionLi
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == LIST_DETAIL_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            data?.let {
-                val newData = data.getParcelableExtra(INTENT_LIST_KEY) ?: TaskList("EMPTY")
-                viewModel.updateList(newData)
-                viewModel.refreshLists()
+    override fun onBackPressed() {
+        val listDetailFragment =
+            supportFragmentManager.findFragmentById(R.id.list_detail_fragment_container)
+
+        if (listDetailFragment == null) {
+            super.onBackPressed()
+        } else {
+            title = resources.getString(R.string.app_name)
+            supportFragmentManager.commit {
+                setReorderingAllowed(true)
+                remove(listDetailFragment)
+            }
+            binding.fabButton.setOnClickListener {
+                showCreateListDialog()
             }
         }
     }
@@ -77,7 +91,6 @@ class MainActivity : AppCompatActivity(), MainFragment.MainFragmentInteractionLi
 
         builder.setTitle(dialogTitle)
         builder.setView(listTitleEditText)
-
         builder.setPositiveButton(positiveButtonTitle) { dialog, _ ->
             dialog.dismiss()
             val taskList = TaskList(listTitleEditText.text.toString())
@@ -86,23 +99,6 @@ class MainActivity : AppCompatActivity(), MainFragment.MainFragmentInteractionLi
         }
 
         builder.create().show()
-    }
-
-    private fun showListDetail(list: TaskList) {
-        if (binding.mainFragmentContainer == null) {
-            val listDetailIntent = Intent(this, ListDetailActivity::class.java)
-            listDetailIntent.putExtra(INTENT_LIST_KEY, list)
-            startActivityForResult(listDetailIntent, LIST_DETAIL_REQUEST_CODE)
-        } else {
-            val bundle = bundleOf(INTENT_LIST_KEY to list)
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                replace(R.id.list_detail_fragment_container, ListDetailFragment::class.java, bundle, null)
-            }
-            binding.fabButton.setOnClickListener {
-                showCreateTaskDialog()
-            }
-        }
     }
 
     private fun showCreateTaskDialog() {
@@ -121,22 +117,35 @@ class MainActivity : AppCompatActivity(), MainFragment.MainFragmentInteractionLi
             .show()
     }
 
+    private fun showListDetail(list: TaskList) {
+
+        if (binding.mainFragmentContainer == null) {
+            val listDetailIntent = Intent(this, ListDetailActivity::class.java)
+            listDetailIntent.putExtra(INTENT_LIST_KEY, list)
+            startActivityForResult(listDetailIntent, LIST_DETAIL_REQUEST_CODE)
+        } else {
+            val bundle = bundleOf(INTENT_LIST_KEY to list)
+            supportFragmentManager.commit {
+                setReorderingAllowed(true)
+                replace(R.id.list_detail_fragment_container, ListDetailFragment::class.java, bundle)
+            }
+
+            binding.fabButton.setOnClickListener {
+                showCreateTaskDialog()
+            }
+        }
+    }
+
     override fun listItemTapped(list: TaskList) {
         showListDetail(list)
     }
 
-    override fun onBackPressed() {
-        val listDetailFragment = supportFragmentManager.findFragmentById(R.id.list_detail_fragment_container)
-        if (listDetailFragment == null) {
-            super.onBackPressed()
-        } else {
-            title = resources.getString(R.string.app_name)
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                remove(listDetailFragment)
-            }
-            binding.fabButton.setOnClickListener {
-                showCreateListDialog()
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == LIST_DETAIL_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            data?.let {
+                viewModel.updateList(data.getParcelableExtra(INTENT_LIST_KEY)!!)
+                viewModel.refreshLists()
             }
         }
     }

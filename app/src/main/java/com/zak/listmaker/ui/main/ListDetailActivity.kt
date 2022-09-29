@@ -1,5 +1,6 @@
 package com.zak.listmaker.ui.main
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -8,12 +9,12 @@ import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
+import com.zak.listmaker.MainActivity
 import com.zak.listmaker.MainActivity.Companion.INTENT_LIST_KEY
 import com.zak.listmaker.R
 import com.zak.listmaker.databinding.ActivityListDetailBinding
 import com.zak.listmaker.models.TaskList
 import com.zak.listmaker.ui.main.ui.detail.ListDetailFragment
-import com.zak.listmaker.ui.main.ui.detail.ListDetailViewModel
 
 class ListDetailActivity : AppCompatActivity() {
 
@@ -29,14 +30,29 @@ class ListDetailActivity : AppCompatActivity() {
         binding.addTaskButton.setOnClickListener {
             showCreateTaskDialog()
         }
-        viewModel = ViewModelProvider(this, MainViewModelFactory(PreferenceManager.getDefaultSharedPreferences(this)))[MainViewModel::class.java]
+
+        viewModel = ViewModelProvider(
+            this,
+            MainViewModelFactory(PreferenceManager.getDefaultSharedPreferences(this))
+        ).get(MainViewModel::class.java)
         viewModel.list = intent.getParcelableExtra(INTENT_LIST_KEY) ?: TaskList("EMPTY")
         title = viewModel.list.name
+        fragment = ListDetailFragment.newInstance()
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.detail_container, ListDetailFragment.newInstance())
+                .replace(R.id.detail_container, fragment)
                 .commitNow()
         }
+    }
+
+    override fun onBackPressed() {
+        val bundle = Bundle()
+        bundle.putParcelable(INTENT_LIST_KEY, viewModel.list)
+
+        val intent = Intent()
+        intent.putExtras(bundle)
+        setResult(Activity.RESULT_OK, intent)
+        super.onBackPressed()
     }
 
     private fun showCreateTaskDialog() {
@@ -54,15 +70,4 @@ class ListDetailActivity : AppCompatActivity() {
             .create()
             .show()
     }
-
-    override fun onBackPressed() {
-        val bundle = Bundle()
-        bundle.putParcelable(INTENT_LIST_KEY, viewModel.list)
-
-        val intent = Intent()
-        intent.putExtras(bundle)
-        setResult(RESULT_OK, intent)
-        super.onBackPressed()
-    }
-
 }

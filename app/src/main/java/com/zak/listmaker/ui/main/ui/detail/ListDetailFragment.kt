@@ -24,34 +24,34 @@ class ListDetailFragment : Fragment() {
 
     private lateinit var viewModel: MainViewModel
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(requireActivity(), MainViewModelFactory(PreferenceManager.getDefaultSharedPreferences(requireActivity())))[MainViewModel::class.java]
-        // TODO: Use the ViewModel
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        val recyclerAdapter = ListItemsRecyclerViewAdapter(viewModel.list)
-        binding.listItemsRecyclerview.adapter = recyclerAdapter
-        binding.listItemsRecyclerview.layoutManager = LinearLayoutManager(requireContext())
-
-        viewModel.onTaskAdded = {
-            recyclerAdapter.notifyDataSetChanged()
-        }
-        val list: TaskList? = arguments?.getParcelable(MainActivity.INTENT_LIST_KEY)
-        if (list != null) {
-            viewModel.list = list
-            requireActivity().title = list.name
-        }
-    }
-
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentListDetailBinding.inflate(inflater, container, false)
         return binding.root
     }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        viewModel = ViewModelProvider(
+            requireActivity(),
+            MainViewModelFactory(PreferenceManager.getDefaultSharedPreferences(requireActivity()))
+        )
+            .get(MainViewModel::class.java)
+
+        val list: TaskList? = arguments?.getParcelable(MainActivity.INTENT_LIST_KEY)
+        if (list != null) {
+            viewModel.list = list
+            requireActivity().title = list.name
+        }
+        binding.listItemsRecyclerview.adapter = ListItemsRecyclerViewAdapter(viewModel.list)
+        binding.listItemsRecyclerview.layoutManager = LinearLayoutManager(requireContext())
+
+        viewModel.onTaskAdded = {
+            val adapter = binding.listItemsRecyclerview.adapter as ListItemsRecyclerViewAdapter
+            adapter.tasksUpdated()
+        }
+    }
 }
